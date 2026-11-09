@@ -18,6 +18,7 @@ from app.schemas.cover_photo import (
     CoverPhotoRead,
     CoverPhotoUpdate,
 )
+from app.schemas.favorite_track import FavoriteTrackCreate, FavoriteTrackRead
 from app.schemas.hashtag import HashtagCreate, HashtagRead, HashtagUpdate
 from app.schemas.notification import (
     NotificationCreate,
@@ -41,6 +42,9 @@ from app.schemas.post import (
     LikeRead,
     LikeUpdate,
     PostCreate,
+    PostRatingCreate,
+    PostRatingRead,
+    PostRatingUpdate,
     PostRead,
     PostUpdate,
 )
@@ -53,6 +57,11 @@ from app.schemas.profile_picture import (
     ProfilePictureCreate,
     ProfilePictureRead,
     ProfilePictureUpdate,
+)
+from app.schemas.profile_track import (
+    ProfileTrackCreate,
+    ProfileTrackRead,
+    ProfileTrackUpdate,
 )
 from app.schemas.social_link import SocialLinkCreate, SocialLinkRead, SocialLinkUpdate
 from app.schemas.track import TrackCreate, TrackRead, TrackUpdate
@@ -73,6 +82,8 @@ __all__ = [
     "CoverPhotoCreate",
     "CoverPhotoRead",
     "CoverPhotoUpdate",
+    "FavoriteTrackCreate",
+    "FavoriteTrackRead",
     "HashtagCreate",
     "HashtagRead",
     "HashtagUpdate",
@@ -96,11 +107,17 @@ __all__ = [
     "PostCommentRead",
     "PostCommentUpdate",
     "PostCreate",
+    "PostRatingCreate",
+    "PostRatingRead",
+    "PostRatingUpdate",
     "PostRead",
     "PostUpdate",
     "ProfilePictureCreate",
     "ProfilePictureRead",
     "ProfilePictureUpdate",
+    "ProfileTrackCreate",
+    "ProfileTrackRead",
+    "ProfileTrackUpdate",
     "RoleEnum",
     "SocialLinkCreate",
     "SocialLinkRead",

@@ -10,7 +10,9 @@ from app.models.abstract_base import AbstractBaseModel
 if TYPE_CHECKING:
     from app.models.album import Album
     from app.models.artist import Artist
+    from app.models.favorite_track import FavoriteTrack
     from app.models.playlist_track import PlaylistTrack
+    from app.models.profile_track import ProfileTrack
 
 
 class Track(AbstractBaseModel):
@@ -33,4 +35,10 @@ class Track(AbstractBaseModel):
     artist: Mapped["Artist"] = relationship("Artist", back_populates="tracks")
     playlist_entries: Mapped[list["PlaylistTrack"]] = relationship(
         "PlaylistTrack", back_populates="track"
+    )
+    favorited_by: Mapped[list["FavoriteTrack"]] = relationship(
+        "FavoriteTrack", back_populates="track", cascade="all, delete-orphan"
+    )
+    profile_entries: Mapped[list["ProfileTrack"]] = relationship(
+        "ProfileTrack", back_populates="track", cascade="all, delete-orphan"
     )

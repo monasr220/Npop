@@ -11,6 +11,8 @@ class PostBase(BaseSchema):
     content: str | None = Field(default=None, max_length=1024)
     image: str | None = Field(default=None, max_length=1024)
     video: str | None = Field(default=None, max_length=1024)
+    # A post can attach a song from any artist.
+    track_id: str | None = Field(default=None, max_length=36)
 
 
 class PostCreate(PostBase):
@@ -22,6 +24,7 @@ class PostUpdate(BaseSchema):
     content: str | None = Field(default=None, max_length=1024)
     image: str | None = Field(default=None, max_length=1024)
     video: str | None = Field(default=None, max_length=1024)
+    track_id: str | None = Field(default=None, max_length=36)
     original_post_id: str | None = Field(default=None, max_length=36)
 
 
@@ -30,8 +33,11 @@ class PostRead(BaseReadSchema):
     content: str | None
     image: str | None
     video: str | None
+    track_id: str | None
     original_post_id: str | None
     updated_at: datetime
+    average_rating: float | None = None
+    rating_count: int = 0
 
 
 class LikeCreate(BaseSchema):
@@ -48,3 +54,17 @@ class LikeRead(BaseReadSchema):
     user_id: str
     post_id: str
     liked: bool
+
+
+class PostRatingCreate(BaseSchema):
+    rating: int = Field(ge=1, le=5)
+
+
+class PostRatingUpdate(BaseSchema):
+    rating: int | None = Field(default=None, ge=1, le=5)
+
+
+class PostRatingRead(BaseReadSchema):
+    user_id: str
+    post_id: str
+    rating: int

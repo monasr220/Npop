@@ -10,6 +10,8 @@ from app.models.abstract_base import AbstractBaseModel
 
 if TYPE_CHECKING:
     from app.models.post_comment import PostComment
+    from app.models.post_rating import PostRating
+    from app.models.track import Track
     from app.models.user import User
 
 
@@ -22,6 +24,10 @@ class Post(AbstractBaseModel):
     content: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
     image: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
     video: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
+    # A post can attach one song from any artist.
+    track_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("tracks.id", ondelete="SET NULL"), nullable=True
+    )
     original_post_id: Mapped[Optional[str]] = mapped_column(
         String(36), ForeignKey("post.id", ondelete="SET NULL"), nullable=True
     )
@@ -30,11 +36,15 @@ class Post(AbstractBaseModel):
     )
 
     user: Mapped["User"] = relationship("User", back_populates="posts")
+    track: Mapped[Optional["Track"]] = relationship("Track")
     comments: Mapped[list["PostComment"]] = relationship(
         "PostComment", back_populates="post", cascade="all, delete-orphan"
     )
     likes: Mapped[list["Like"]] = relationship(
         "Like", back_populates="post", cascade="all, delete-orphan"
+    )
+    ratings: Mapped[list["PostRating"]] = relationship(
+        "PostRating", back_populates="post", cascade="all, delete-orphan"
     )
     original_post: Mapped[Optional["Post"]] = relationship(
         "Post",
@@ -44,6 +54,16 @@ class Post(AbstractBaseModel):
     reposts: Mapped[list["Post"]] = relationship(
         "Post", back_populates="original_post"
     )
+
+    @property
+    def average_rating(self) -> float | None:
+        if not self.ratings:
+            return None
+        return round(sum(rating.rating for rating in self.ratings) / len(self.ratings), 2)
+
+    @property
+    def rating_count(self) -> int:
+        return len(self.ratings)
 
     def __str__(self) -> str:
         return self.content or self.image or self.video or ""

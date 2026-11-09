@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import Field
 
 from app.schemas.common import BaseReadSchema, BaseSchema
@@ -22,8 +24,11 @@ class ArtistUpdate(BaseSchema):
 
 
 class ArtistRead(BaseReadSchema):
+    user_id: str | None
     name: str
     bio: str
     image_url: str
     monthly_listeners: int
     accent: str
+    verified: bool
+    verified_at: datetime | None

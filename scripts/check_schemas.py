@@ -30,6 +30,7 @@ from app.models import (  # noqa: E402
     Album,
     Artist,
     CoverPhoto,
+    FavoriteTrack,
     Hashtag,
     Like,
     Notification,
@@ -38,7 +39,9 @@ from app.models import (  # noqa: E402
     PlaylistTrack,
     Post,
     PostComment,
+    PostRating,
     ProfilePicture,
+    ProfileTrack,
     RoleEnum,
     SocialLink,
     Track,
@@ -53,6 +56,8 @@ from app.schemas import (  # noqa: E402
     ArtistRead,
     CoverPhotoCreate,
     CoverPhotoRead,
+    FavoriteTrackCreate,
+    FavoriteTrackRead,
     HashtagCreate,
     HashtagRead,
     LikeCreate,
@@ -68,9 +73,13 @@ from app.schemas import (  # noqa: E402
     PostCommentCreate,
     PostCommentRead,
     PostCreate,
+    PostRatingCreate,
+    PostRatingRead,
     PostRead,
     ProfilePictureCreate,
     ProfilePictureRead,
+    ProfileTrackCreate,
+    ProfileTrackRead,
     SocialLinkCreate,
     SocialLinkRead,
     TrackCreate,
@@ -122,6 +131,13 @@ def build_database(session_factory):
         post.comments.append(PostComment(comment="nice", user=bob))
         post.likes.append(Like(user=bob, liked=True))
         db.add(post)
+        db.add_all(
+            [
+                FavoriteTrack(user=alice, track=track),
+                ProfileTrack(user=alice, track=track, position=1),
+                PostRating(user=bob, post=post, rating=5),
+            ]
+        )
         db.add(PlayHistory(user=alice, track=track))
         db.commit()
 
@@ -135,6 +151,7 @@ def check_read_schemas(session_factory) -> None:
             (PostRead, db.query(Post).one()),
             (LikeRead, db.query(Like).one()),
             (PostCommentRead, db.query(PostComment).one()),
+            (PostRatingRead, db.query(PostRating).one()),
             (CoverPhotoRead, db.query(CoverPhoto).one()),
             (ProfilePictureRead, db.query(ProfilePicture).one()),
             (SocialLinkRead, db.query(SocialLink).one()),
@@ -145,6 +162,8 @@ def check_read_schemas(session_factory) -> None:
             (PlaylistRead, db.query(Playlist).one()),
             (PlaylistTrackRead, db.query(PlaylistTrack).one()),
             (PlayHistoryRead, db.query(PlayHistory).one()),
+            (FavoriteTrackRead, db.query(FavoriteTrack).one()),
+            (ProfileTrackRead, db.query(ProfileTrack).one()),
         ]
 
         for schema, obj in checks:
@@ -165,9 +184,12 @@ def check_create_schemas() -> None:
         NotificationCreate(user_id="u" * 36, message="hi"),
         PostCreate(user_id="u" * 36, content="hello"),
         PostCommentCreate(user_id="u" * 36, post_id="p" * 36, comment="nice"),
+        PostRatingCreate(rating=5),
         LikeCreate(user_id="u" * 36, post_id="p" * 36),
         CoverPhotoCreate(user_id="u" * 36, image="cover.jpg"),
         ProfilePictureCreate(user_id="u" * 36, image="avatar.jpg"),
+        FavoriteTrackCreate(track_id="t" * 36),
+        ProfileTrackCreate(track_id="t" * 36, position=1),
         SocialLinkCreate(user_id="u" * 36, link="https://example.com"),
         HashtagCreate(tag="music"),
         ArtistCreate(name="The Band"),
@@ -183,8 +205,8 @@ def check_create_schemas() -> None:
 
     assert samples[0].role == RoleEnum.user
     assert samples[3].status.value == "unread"
-    assert samples[13].track_number == 1
-    assert samples[14].is_system is False
+    assert samples[16].track_number == 1
+    assert samples[17].is_system is False
 
     def rejects(schema, **data) -> bool:
         try:
@@ -197,6 +219,8 @@ def check_create_schemas() -> None:
     assert rejects(HashtagCreate, tag="x" * 56)
     assert rejects(TrackCreate, title="t", album_id="a" * 36, artist_id="a" * 36, track_number=0)
     assert rejects(PostCreate, user_id="u" * 36, content="x" * 1025)
+    assert rejects(PostRatingCreate, rating=6)
+    assert rejects(PostRatingCreate, rating=0)
     print("OK validation guards reject invalid input")
 
 
