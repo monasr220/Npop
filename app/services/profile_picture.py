@@ -9,7 +9,7 @@ from app.models.profile_picture import ProfilePicture
 from app.schemas.profile_picture import ProfilePictureCreate
 from app.services.base import CRUDService
 from app.utils.pagination import DEFAULT_PAGE_SIZE, paginate
-from app.utils.storage import upload
+from app.utils.storage import ensure_http_url, upload
 
 
 class ProfilePictureService(CRUDService[ProfilePicture]):
@@ -49,6 +49,8 @@ class ProfilePictureService(CRUDService[ProfilePicture]):
         user_id: str,
         image: str,
     ) -> ProfilePicture:
+        if image:
+            image = ensure_http_url(image, field="image_url")
         return self.create(
             db,
             ProfilePictureCreate(user_id=user_id, image=image),
@@ -60,7 +62,7 @@ class ProfilePictureService(CRUDService[ProfilePicture]):
         user_id: str,
         file,
     ) -> ProfilePicture:
-        image_url = upload(file)
+        image_url = upload(file, kind="image", folder="npop/avatars")
         if not image_url:
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,

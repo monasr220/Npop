@@ -9,7 +9,7 @@ from app.models.cover_photo import CoverPhoto
 from app.schemas.cover_photo import CoverPhotoCreate
 from app.services.base import CRUDService
 from app.utils.pagination import DEFAULT_PAGE_SIZE, paginate
-from app.utils.storage import upload
+from app.utils.storage import ensure_http_url, upload
 
 
 class CoverPhotoService(CRUDService[CoverPhoto]):
@@ -45,13 +45,15 @@ class CoverPhotoService(CRUDService[CoverPhoto]):
         user_id: str,
         image: str,
     ) -> CoverPhoto:
+        if image:
+            image = ensure_http_url(image, field="image_url")
         return self.create(
             db,
             CoverPhotoCreate(user_id=user_id, image=image),
         )
 
     def upload_for_user(self, db: Session, user_id: str, file) -> CoverPhoto:
-        image_url = upload(file)
+        image_url = upload(file, kind="image", folder="npop/covers")
         if not image_url:
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,

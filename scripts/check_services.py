@@ -146,13 +146,23 @@ def check_users(db) -> dict:
     assert not user_service.is_following(db, current.id, bob["user"].id)
     print("OK user_service.unfollow            -> graph updated")
 
-    profile_picture_service.create_for_user(db, current.id, "avatar.jpg")
-    cover_photo_service.create_for_user(db, current.id, "cover.jpg")
+    profile_picture_service.create_for_user(
+        db, current.id, "https://example.com/avatar.jpg"
+    )
+    cover_photo_service.create_for_user(
+        db, current.id, "https://example.com/cover.jpg"
+    )
     social_link_service.replace_for_user(
         db, current.id, ["https://a.example", "https://b.example"]
     )
-    assert profile_picture_service.latest_for_user(db, current.id).image == "avatar.jpg"
-    assert cover_photo_service.latest_for_user(db, current.id).image == "cover.jpg"
+    assert (
+        profile_picture_service.latest_for_user(db, current.id).image
+        == "https://example.com/avatar.jpg"
+    )
+    assert (
+        cover_photo_service.latest_for_user(db, current.id).image
+        == "https://example.com/cover.jpg"
+    )
     assert len(social_link_service.list_for_user(db, current.id)) == 2
 
     detail = user_service.get_user_detail(db, current.id)

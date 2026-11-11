@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Npop — music &amp; social</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <!-- ------------------------------------------------------------ auth -->
+    <div id="auth-screen" class="auth-screen hidden">
+      <div class="auth-card">
+        <div class="brand big">Npop</div>
+        <p class="muted">A social home for music lovers.</p>
+
+        <div class="tabs">
+          <button class="tab active" data-auth-tab="login">Log in</button>
+          <button class="tab" data-auth-tab="register">Register</button>
+        </div>
+
+        <form id="login-form" class="auth-form">
+          <label>Email<input name="email" type="email" required autocomplete="email" /></label>
+          <label>Password<input name="password" type="password" required autocomplete="current-password" /></label>
+          <button class="primary" type="submit">Log in</button>
+        </form>
+
+        <form id="register-form" class="auth-form hidden">
+          <label>Username<input name="username" required minlength="3" maxlength="255" /></label>
+          <label>Email<input name="email" type="email" required autocomplete="email" /></label>
+          <label>Password<input name="password" type="password" required minlength="8" autocomplete="new-password" /></label>
+          <label>Bio (optional)<input name="bio" maxlength="1024" /></label>
+          <button class="primary" type="submit">Create account</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------- app -->
+    <div id="app-screen" class="app hidden">
+      <aside class="sidebar">
+        <div class="brand">Npop</div>
+        <nav id="nav">
+          <button class="nav-btn active" data-view="feed">Feed</button>
+          <button class="nav-btn" data-view="explore">Explore</button>
+          <button class="nav-btn" data-view="playlists">Playlists</button>
+          <button class="nav-btn" data-view="notifications">Notifications</button>
+          <button class="nav-btn" data-view="profile">Profile</button>
+        </nav>
+        <div class="sidebar-foot">
+          <div id="user-chip" class="user-chip"></div>
+          <button id="logout-btn" class="ghost">Log out</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <h1 id="view-title">Feed</h1>
+          <div class="search-box">
+            <input id="global-search" placeholder="Search artists or tracks" />
+            <button id="search-btn" class="primary">Search</button>
+          </div>
+        </header>
+        <section id="view" class="view"></section>
+      </main>
+    </div>
+
+    <!-- ---------------------------------------------------------- player -->
+    <div id="player" class="player hidden">
+      <div id="player-info" class="player-info">Nothing playing</div>
+      <audio id="audio" controls preload="none"></audio>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+    <script src="/app.js"></script>
+  </body>
+</html>

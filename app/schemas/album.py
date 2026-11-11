@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pydantic import Field
 
+from app.schemas.artist import ArtistRead
 from app.schemas.common import BaseReadSchema, BaseSchema
 
 
@@ -27,3 +28,4 @@ class AlbumRead(BaseReadSchema):
     cover_url: str
     release_year: int
     kind: str
+    artist: ArtistRead | None = None

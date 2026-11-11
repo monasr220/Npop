@@ -11,6 +11,7 @@ from app.schemas.artist import ArtistCreate, ArtistUpdate
 from app.services.base import CRUDService
 from app.utils.crud import apply_updates, commit_and_refresh
 from app.utils.pagination import DEFAULT_PAGE_SIZE, paginate
+from app.utils.storage import ensure_http_url
 from app.utils.time import utcnow
 
 
@@ -77,7 +78,12 @@ class ArtistService(CRUDService[Artist]):
                 detail="User already has an artist profile",
             )
 
-        artist = Artist(user_id=user.id, **payload.model_dump())
+        data = payload.model_dump()
+        if data.get("image_url"):
+            data["image_url"] = ensure_http_url(
+                data["image_url"], field="image_url"
+            )
+        artist = Artist(user_id=user.id, **data)
         db.add(artist)
 
         if user.role != RoleEnum.artist:
@@ -94,7 +100,12 @@ class ArtistService(CRUDService[Artist]):
         payload: ArtistUpdate,
     ) -> Artist:
         artist = self.require_artist_profile(db, user)
-        apply_updates(artist, payload.model_dump(exclude_unset=True))
+        data = payload.model_dump(exclude_unset=True)
+        if data.get("image_url"):
+            data["image_url"] = ensure_http_url(
+                data["image_url"], field="image_url"
+            )
+        apply_updates(artist, data)
         return commit_and_refresh(db, artist)
 
     def verify(

@@ -16,6 +16,7 @@ from app.services.notification import notification_service
 from app.services.post_rating import post_rating_service
 from app.utils.crud import apply_updates, commit_and_refresh, delete_and_commit
 from app.utils.pagination import DEFAULT_PAGE_SIZE, paginate
+from app.utils.storage import ensure_http_url
 
 # A post needs at least one of these, or it must be a repost.
 CONTENT_FIELDS = ("content", "image", "video", "track_id")
@@ -86,6 +87,7 @@ class PostService(CRUDService[Post]):
             self.get_or_404(db, original_post_id, detail="Original post not found")
 
         self._validate_track(db, data.get("track_id"))
+        self._validate_media_urls(data)
 
         post = Post(user_id=user.id, **data)
         db.add(post)
@@ -114,6 +116,7 @@ class PostService(CRUDService[Post]):
 
         if "track_id" in data:
             self._validate_track(db, data["track_id"])
+        self._validate_media_urls(data)
 
         apply_updates(post, data)
         return commit_and_refresh(db, post)
@@ -137,6 +140,14 @@ class PostService(CRUDService[Post]):
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Track not found",
             )
+
+    @staticmethod
+    def _validate_media_urls(data: dict) -> None:
+        """Only http(s) media URLs are stored, which blocks ``javascript:`` XSS."""
+        for field in ("image", "video"):
+            value = data.get(field)
+            if value:
+                data[field] = ensure_http_url(value, field=field)
 
     # ----------------------------------------------------------------- ratings
     def rate_post(

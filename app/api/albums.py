@@ -9,12 +9,15 @@ from fastapi import (
     Form,
     HTTPException,
     Query,
+    Request,
     UploadFile,
     status,
 )
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
+from app.core.config import settings
+from app.core.limiter import limiter
 from app.db.session import get_db
 from app.models.album import Album
 from app.models.user import User
@@ -73,7 +76,9 @@ def delete_album(
 
 
 @router.post("/{album_id}/cover", response_model=AlbumRead)
+@limiter.limit(settings.rate_limit_upload)
 def upload_album_cover(
+    request: Request,
     album_id: str,
     file: UploadFile | None = File(default=None),
     cover_url: str | None = Form(default=None),

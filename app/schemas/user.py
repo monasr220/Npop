@@ -38,3 +38,14 @@ class UserRead(BaseReadSchema):
     role: RoleEnum
     last_login: datetime | None
     updated_at: datetime
+
+
+class UserPublic(BaseReadSchema):
+    """User profile safe to show to other users (no email)."""
+
+    username: str
+    bio: str | None
+    contact_info: str | None
+    role: RoleEnum
+    last_login: datetime | None
+    updated_at: datetime

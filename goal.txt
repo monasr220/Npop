@@ -1,0 +1,1253 @@
+# Npop — Full-Stack Frontend, UX, Architecture & Security Specification
+
+## 1. Project Vision
+
+Npop is a Music Social Network that combines music streaming, artist publishing, and social interaction.
+
+It is a platform where:
+- Listeners discover, listen to, rate, and discuss music.
+- Artists publish music, manage albums, and build communities.
+- Users interact through posts, comments, ratings, playlists, and following.
+
+The objective is to build a complete, production-oriented application with a professional interface, organized architecture, strong security, and comprehensive documentation.
+
+This is not a simple UI project. Treat it as a real software product.
+
+---
+
+# 2. Existing Backend — Preserve and Improve
+
+The backend already exists and uses:
+
+- Python
+- FastAPI
+- SQLAlchemy
+- SQLite (configurable database URL)
+- JWT Authentication
+- Cloudinary
+- Server-Sent Events (SSE)
+
+Existing project directories:
+
+- `app/api/`
+- `app/models/`
+- `app/schemas/`
+- `app/services/`
+- `app/core/`
+- `app/db/`
+- `app/utils/`
+
+API prefix: `/api`
+
+Swagger:
+
+`http://localhost:5001/docs`
+
+Before making changes:
+
+1. Inspect the complete project.
+2. Inspect all API routers.
+3. Inspect database models and relationships.
+4. Inspect Pydantic schemas.
+5. Inspect authentication and authorization.
+6. Inspect upload and storage mechanisms.
+7. Inspect the existing `app/main.py`.
+8. Identify architectural problems and duplicated code.
+9. Identify security weaknesses.
+10. Produce a project audit before modifying anything.
+
+Do not blindly rewrite working backend functionality.
+
+Refactoring is allowed when it improves security, maintainability, consistency, or architecture, but preserve existing functionality and API compatibility wherever possible.
+
+---
+
+# 3. Brand Identity & Three Primary Colors
+
+Npop must have a recognizable visual identity.
+
+Use exactly three primary brand colors across the application.
+
+The colors should communicate:
+- Music culture and creativity.
+- Confidence and identity.
+- A strong social community.
+- A distinctive editorial aesthetic.
+
+### Primary palette
+
+<escape>
+1. WARM BEIGE — #E8DCC8
+2. DEEP RED — #B3262D
+3. MATTE BLACK — #171717
+</escape>
+
+These are the three primary brand colors.
+
+### Color roles
+
+**Warm Beige — #E8DCC8**
+- Main light-theme background.
+- Secondary surfaces, content areas, cards and reading surfaces.
+
+**Deep Red — #B3262D**
+- Primary brand accent, main action buttons and active navigation.
+- Likes, social interactions, highlights and selected states.
+
+**Matte Black — #171717**
+- Main dark-theme background.
+- Typography on light surfaces, navigation and strong contrast.
+
+Supporting neutral shades derived from the three colors are allowed for borders,
+muted text, disabled elements, secondary backgrounds and subtle separators.
+Do not introduce additional competing brand colors.
+
+### Visual direction
+
+The design should communicate music culture, creativity, confidence, identity,
+a strong social community and a distinctive editorial aesthetic. Avoid a generic
+corporate-dashboard look.
+
+### Light theme
+
+Warm beige is the dominant background, matte black carries typography and deep
+red marks important interactions. The result should feel warm, clean, elegant
+and comfortable for extended browsing.
+
+### Dark theme
+
+Matte black is the dominant background with slightly lighter neutral surfaces,
+beige typography and deep red for important interactions. Avoid pure black
+everywhere; use subtle surface variations for hierarchy.
+
+### Design rules
+
+- Keep color usage consistent across all pages.
+- Red is an accent, not the dominant background.
+- Beige provides warmth and reduces harsh contrast.
+- Black establishes structure and readability.
+- Do not use all three colors equally in every component.
+- Maintain WCAG AA contrast wherever applicable and test both themes
+  independently.
+- Define colors centrally using CSS variables or Tailwind design tokens.
+- Do not use random gradients or excessive shadows.
+
+---
+
+# 4. Professional UI/UX Design Requirements
+
+Act as a senior product designer and experienced web designer, not merely a frontend developer.
+
+The existing design direction must be evaluated critically.
+
+Do not accept the first visually acceptable result.
+
+Your responsibility is to create an interface that is visually distinctive, comfortable to use, intuitive, and consistent.
+
+### Visual quality
+
+Focus on:
+
+- Strong visual hierarchy.
+- Professional typography.
+- Consistent spacing.
+- Balanced layouts.
+- Proper content density.
+- Clear navigation.
+- Consistent component sizing.
+- High-quality album artwork presentation.
+- Proper image cropping.
+- Carefully designed empty states.
+- Meaningful hover and focus states.
+- Subtle and purposeful animations.
+
+### Eye comfort
+
+Design for extended usage sessions.
+
+Requirements:
+
+- Avoid excessive contrast between adjacent elements.
+- Avoid pure white backgrounds in dark mode.
+- Avoid excessively bright accent colors.
+- Avoid large areas of saturated colors.
+- Use comfortable line heights.
+- Maintain readable font sizes.
+- Avoid unnecessary visual noise.
+- Keep interactive elements easy to identify.
+- Ensure text remains readable on mobile devices.
+- Respect reduced-motion preferences.
+
+Support a coherent dark theme and light theme.
+
+Both themes must be deliberately designed rather than simply inverting colors.
+
+### UX principles
+
+- Minimize unnecessary user actions.
+- Make navigation predictable.
+- Keep important actions discoverable.
+- Provide immediate and understandable feedback.
+- Prevent accidental destructive actions.
+- Use confirmation dialogs when appropriate.
+- Display loading skeletons where useful.
+- Design meaningful empty, error, and success states.
+- Ensure forms have clear validation messages.
+- Make the application keyboard accessible.
+
+### Design consistency
+
+Create a reusable design system containing:
+
+- Color tokens.
+- Typography scale.
+- Spacing scale.
+- Border radius tokens.
+- Shadows.
+- Buttons.
+- Inputs.
+- Modals.
+- Dropdowns.
+- Cards.
+- Navigation.
+- Notifications.
+- Music player.
+- Post components.
+- Artist cards.
+- Track cards.
+- Album cards.
+
+Avoid creating separate visual styles for the same component in different pages.
+
+Do not blindly copy Spotify, Instagram, or other platforms.
+
+Npop must have its own visual identity.
+
+---
+
+# 5. User Types — Listener vs Artist
+
+This distinction is a fundamental part of Npop.
+
+Do not treat every user as having the same experience.
+
+The application must clearly distinguish between a Listener and an Artist.
+
+## Listener Experience
+
+A Listener is someone who primarily consumes and interacts with music.
+
+The Listener should have access to:
+
+- Music discovery.
+- Music playback.
+- Artist discovery.
+- Album browsing.
+- Social feed.
+- Creating posts.
+- Commenting.
+- Rating posts.
+- Liking and sharing.
+- Following artists and users.
+- Creating playlists.
+- Managing favorites.
+- Listening history.
+- Personal profile.
+- Notifications.
+
+The Listener should not see artist-only management tools.
+
+## Artist Experience
+
+An Artist is a user who publishes and manages music.
+
+An Artist has all Listener capabilities, plus:
+
+- Artist profile.
+- Artist dashboard.
+- Music upload.
+- Album creation.
+- Track management.
+- Album artwork management.
+- Published music management.
+- Artist-specific statistics.
+- Audience and follower information.
+
+Artist-specific navigation should include:
+
+- Artist Dashboard.
+- My Music.
+- My Albums.
+- Upload Track.
+- Manage Profile.
+
+### Role-specific UX
+
+The UI should adapt based on the authenticated user's actual role.
+
+Examples:
+
+**Listener**
+- Discover Music.
+- Your Playlists.
+- Your Favorites.
+- Listening History.
+
+**Artist**
+- Artist Studio.
+- Your Discography.
+- Upload Music.
+- Manage Albums.
+- Audience Overview.
+
+Do not simply hide or display buttons.
+
+The navigation, dashboard, and relevant user workflows should reflect the user's role.
+
+### Important authorization rules
+
+- Only authorized artists can upload tracks.
+- Artists can only manage their own content.
+- Regular users cannot access artist management endpoints.
+- Users cannot modify another user's profile or resources without permission.
+- Admin permissions must be separate.
+
+Frontend role checks are for UX only. The backend must enforce all permissions independently.
+
+Do not invent a role-conversion or artist-registration process if the existing backend does not support it. Identify what is missing and propose the necessary backend implementation.
+
+---
+
+# 6. Application Pages
+
+Implement the complete application:
+
+### Authentication
+- Login.
+- Register.
+- Logout.
+- Protected routes.
+- JWT handling.
+- Role-aware navigation.
+
+### Home / Discovery
+- Popular tracks.
+- New releases.
+- Popular artists.
+- Trending hashtags.
+- Recent posts.
+- Music discovery.
+
+### Social Feed
+- Create, edit, delete posts.
+- Like and unlike.
+- Comments.
+- Ratings from 1–5.
+- Reposts.
+- Music attachments.
+
+### Track Details
+- Track information.
+- Artist and album.
+- Artwork.
+- Playback.
+- Favorites.
+- Playlist integration.
+
+### Artists
+- Artist discovery.
+- Artist search.
+- Artist profiles.
+- Verification.
+- Followers.
+- Discography.
+
+### Albums
+- Album discovery.
+- Album details.
+- Track listings.
+- Artist information.
+
+### Playlists
+- Create.
+- Edit.
+- Delete.
+- Add and remove tracks.
+- Reorder tracks.
+- Playlist artwork.
+
+### User Profiles
+- Profile image.
+- Cover image.
+- Bio.
+- Followers.
+- Following.
+- Posts.
+- Playlists.
+- Favorites.
+- Listening history.
+
+### Artist Dashboard
+- Artist overview.
+- Music management.
+- Album management.
+- Track uploads.
+- Artwork uploads.
+- Statistics.
+
+### Notifications
+- Notification center.
+- Unread count.
+- Mark as read.
+- Real-time SSE integration.
+
+### Search
+Search across:
+- Users.
+- Artists.
+- Tracks.
+- Albums.
+- Hashtags.
+
+### Persistent Music Player
+
+Implement a global player with:
+- Play / Pause.
+- Next / Previous.
+- Seek.
+- Volume.
+- Duration.
+- Current time.
+- Track artwork.
+- Playlist integration.
+
+Playback must persist across route navigation.
+
+---
+
+# 7. Privacy Policy & Terms of Service
+
+Create complete legal-information pages.
+
+These must be accessible without authentication.
+
+Create:
+
+- `/privacy-policy`
+- `/terms-of-service`
+
+Also add links in the registration page and application footer.
+
+## Privacy Policy
+
+Write a structured Privacy Policy covering:
+
+1. Introduction.
+2. Information collected.
+3. Account information.
+4. Profile information.
+5. Music uploads and user-generated content.
+6. Listening activity and interaction data.
+7. Cookies and session information.
+8. Cloudinary and third-party services.
+9. How information is used.
+10. Data retention.
+11. Data security.
+12. Data sharing.
+13. User rights.
+14. Account deletion.
+15. Data deletion requests.
+16. Policy changes.
+17. Contact information.
+
+Be transparent about the actual information the application collects.
+
+Do not claim that the application does not collect data if it actually does.
+
+Do not invent third-party integrations.
+
+## Terms of Service
+
+Create a structured Terms of Service covering:
+
+1. Acceptance of terms.
+2. Eligibility and account registration.
+3. Account responsibilities.
+4. Listener responsibilities.
+5. Artist responsibilities.
+6. Music ownership and copyright.
+7. Music upload permissions.
+8. User-generated content.
+9. Prohibited content.
+10. Harassment and abusive behavior.
+11. Copyright infringement and takedown procedures.
+12. Content moderation.
+13. Account suspension and termination.
+14. Intellectual property.
+15. Limitation of liability.
+16. Changes to the terms.
+17. Contact information.
+
+### Music copyright is particularly important
+
+Artists must confirm that they own or have permission to distribute uploaded music.
+
+Npop must not imply that uploaded music automatically becomes owned by the platform.
+
+Create clear rules for copyright infringement and content removal.
+
+### Legal accuracy
+
+These documents must reflect the actual application's behavior.
+
+Do not invent a company address, legal entity, contact email, or compliance certification.
+
+Use clearly marked placeholders when necessary.
+
+Do not claim GDPR, CCPA, or other legal compliance without implementing and verifying the applicable requirements.
+
+Treat the generated policies as implementation drafts requiring legal review before public launch.
+
+---
+
+# 8. Security — Production-Oriented Security Requirements
+
+Security must be treated as a core engineering requirement.
+
+Do not consider a project secure merely because it uses JWT.
+
+Perform a security audit of the existing backend and fix identified vulnerabilities.
+
+## 8.1 Authentication Security
+
+- Secure password hashing using Argon2id or a properly configured bcrypt implementation.
+- Never store plaintext passwords.
+- Validate credentials.
+- Implement appropriate access-token expiration.
+- Use secure refresh-token handling if supported or implement it properly.
+- Revoke or invalidate sessions where appropriate.
+- Protect against brute-force login attempts.
+- Avoid revealing whether a particular email address exists during authentication.
+- Protect sensitive authentication endpoints.
+
+Do not invent a refresh-token endpoint without implementing and testing its backend functionality.
+
+## 8.2 Authorization
+
+Implement server-side authorization for every protected operation.
+
+Prevent:
+
+- Unauthorized access to private resources.
+- IDOR vulnerabilities.
+- Users modifying other users' content.
+- Artists modifying another artist's music.
+- Regular users accessing administrative functions.
+- Unauthorized file access.
+
+Always verify resource ownership on the backend.
+
+## 8.3 Rate Limiting
+
+Implement real server-side Rate Limiting.
+
+Do not implement rate limiting only in React.
+
+Use an appropriate backend solution such as SlowAPI or another maintained rate-limiting library.
+
+Configure limits according to endpoint sensitivity.
+
+Suggested initial policy:
+
+| Endpoint category | Suggested limit |
+|---|---|
+| Login | 5 attempts / minute / IP |
+| Registration | 5 requests / hour / IP |
+| Password reset | 3 requests / hour / IP |
+| Comments and posts | 30 requests / minute / user |
+| Search | 60 requests / minute / user |
+| Music upload | 5 requests / hour / artist |
+| General API | 120 requests / minute / user or IP |
+
+These are initial configuration values, not universal limits. Adjust them according to expected traffic and testing.
+
+Requirements:
+
+- Return HTTP 429 when limits are exceeded.
+- Include appropriate retry information.
+- Apply stricter limits to sensitive operations.
+- Consider both IP and authenticated user identity.
+- Use a shared storage backend such as Redis when deploying multiple workers or instances.
+- Avoid trusting spoofable forwarded IP headers.
+- Document all rate limits.
+
+## 8.4 Input Validation
+
+- Validate all incoming request data.
+- Use Pydantic schemas.
+- Apply length limits.
+- Validate IDs and query parameters.
+- Validate uploaded files.
+- Prevent unexpected file types.
+- Prevent excessively large requests.
+- Sanitize or safely render user-generated content.
+
+Never trust client-side validation alone.
+
+## 8.5 XSS Protection
+
+Protect against Cross-Site Scripting.
+
+- Escape user-generated content.
+- Avoid dangerous HTML rendering.
+- Sanitize rich-text content if supported.
+- Use safe rendering practices.
+- Configure a suitable Content Security Policy.
+
+Pay particular attention to posts, comments, biographies, and profile information.
+
+## 8.6 SQL Injection Protection
+
+- Use SQLAlchemy parameterized operations.
+- Avoid unsafe raw SQL.
+- Validate dynamic sorting and filtering parameters.
+- Never concatenate untrusted input into SQL queries.
+
+## 8.7 CSRF Protection
+
+If authentication uses cookies:
+
+- Configure appropriate SameSite behavior.
+- Enable Secure and HttpOnly flags.
+- Implement CSRF protection for state-changing operations where required.
+
+If using Bearer tokens in authorization headers, evaluate the actual browser storage and request model rather than blindly applying cookie-based assumptions.
+
+## 8.8 File Upload Security
+
+Music and image uploads require special attention.
+
+Implement:
+
+- File size limits.
+- Allowed extensions.
+- MIME-type validation.
+- File signature validation where applicable.
+- Safe filenames.
+- Upload authorization.
+- Ownership validation.
+- Storage isolation.
+- Safe deletion behavior.
+
+Do not trust filenames or MIME types provided by the browser.
+
+Keep Cloudinary credentials on the backend.
+
+Use secure server-side upload flows or properly restricted signed uploads.
+
+Do not expose Cloudinary API secrets in frontend code.
+
+## 8.9 HTTP Security
+
+Configure suitable HTTP security headers:
+
+- Content-Security-Policy.
+- X-Content-Type-Options.
+- Referrer-Policy.
+- Strict-Transport-Security in HTTPS production environments.
+- Appropriate frame protection.
+
+Configure CORS with explicit trusted origins.
+
+Do not use unrestricted wildcard origins with credentialed requests.
+
+Use HTTPS in production.
+
+## 8.10 Secrets and Environment Variables
+
+- Keep credentials in environment variables.
+- Never commit `.env` files.
+- Provide a sanitized `.env.example`.
+- Validate required configuration at startup.
+- Separate development and production settings.
+- Never expose secrets through API responses or logs.
+
+## 8.11 Database Security and Reliability
+
+- Use database constraints.
+- Use transactions where appropriate.
+- Avoid unsafe cascade behavior.
+- Add indexes to frequently queried fields.
+- Use proper migration management with Alembic if needed.
+- Configure database backups.
+- Test restore procedures.
+
+If deploying with multiple workers, ensure the database configuration supports concurrent production usage. Do not assume SQLite is suitable for every deployment scenario.
+
+## 8.12 Logging and Monitoring
+
+- Use structured logging.
+- Log important security events.
+- Log authentication failures without logging passwords or tokens.
+- Record relevant administrative actions.
+- Monitor unexpected errors.
+- Avoid exposing internal tracebacks to users.
+- Add health-check endpoints where appropriate.
+
+## 8.13 Dependency Security
+
+- Audit Python dependencies.
+- Audit frontend dependencies.
+- Remove unnecessary packages.
+- Pin or manage dependency versions appropriately.
+- Review known vulnerabilities.
+- Avoid abandoned libraries.
+
+### Security completion requirement
+
+Produce a security checklist documenting:
+
+- Implemented protections.
+- Tested protections.
+- Remaining vulnerabilities.
+- Known limitations.
+- Deployment recommendations.
+
+Do not claim the system is fully secure without actual verification.
+
+---
+
+# 9. Clean Architecture & Project Refactoring
+
+The project must have a professional, maintainable structure.
+
+Inspect the current structure and refactor it carefully.
+
+Do not rename files randomly.
+
+Do not create unnecessary abstraction layers.
+
+Use clear, predictable naming conventions.
+
+## Backend structure target
+
+Use a structure similar to:
+
+```text
+Npop/
+│
+├── app/
+│   ├── api/
+│   │   └── v1/
+│   │       ├── auth.py
+│   │       ├── users.py
+│   │       ├── artists.py
+│   │       ├── tracks.py
+│   │       ├── albums.py
+│   │       ├── playlists.py
+│   │       ├── posts.py
+│   │       ├── notifications.py
+│   │       └── hashtags.py
+│   │
+│   ├── core/
+│   │   ├── config.py
+│   │   ├── security.py
+│   │   ├── permissions.py
+│   │   └── rate_limit.py
+│   │
+│   ├── db/
+│   │   ├── session.py
+│   │   └── base.py
+│   │
+│   ├── models/
+│   ├── schemas/
+│   ├── services/
+│   ├── repositories/
+│   ├── dependencies/
+│   ├── middleware/
+│   └── utils/
+│
+├── Frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   ├── features/
+│   │   │   ├── auth/
+│   │   │   ├── users/
+│   │   │   ├── artists/
+│   │   │   ├── tracks/
+│   │   │   ├── albums/
+│   │   │   ├── playlists/
+│   │   │   ├── posts/
+│   │   │   └── notifications/
+│   │   ├── layouts/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── hooks/
+│   │   ├── context/
+│   │   ├── types/
+│   │   ├── utils/
+│   │   └── styles/
+│   │
+│   ├── public/
+│   ├── package.json
+│   └── vite.config.ts
+│
+├── tests/
+│
+├── docs/
+│
+├── scripts/
+│
+├── .env.example
+├── .gitignore
+├── README.md
+├── requirements.txt
+└── main.py
+```
+
+This is a target structure, not an instruction to create empty directories.
+
+Only create directories when they serve a real purpose.
+
+Adapt the structure to the existing project and preserve working imports and functionality.
+
+## Naming Conventions
+
+Use consistent naming throughout the project.
+
+Python:
+- `snake_case` for files, variables, and functions.
+- `PascalCase` for classes.
+- Descriptive module names.
+
+React / TypeScript:
+- `PascalCase` for React component files and components.
+- `camelCase` for functions and variables.
+- `kebab-case` or consistent domain-based naming for non-component assets.
+- Clear names for API services, hooks, and types.
+
+Examples:
+
+Avoid:
+- `test2.py`
+- `new_final.py`
+- `userStuff.ts`
+- `data1.ts`
+- `temp.jsx`
+
+Prefer:
+- `user_service.py`
+- `artist_dashboard.tsx`
+- `track_api.ts`
+- `use_current_user.ts`
+- `playlist_schema.py`
+
+## Refactoring Rules
+
+- Remove unused files.
+- Remove duplicate code.
+- Remove abandoned experiments.
+- Remove dead imports.
+- Avoid circular dependencies.
+- Avoid oversized modules.
+- Separate business logic from API routing.
+- Separate frontend UI from API communication.
+- Keep naming consistent.
+- Avoid unnecessary abstractions.
+- Preserve existing functionality.
+- Update every import after renaming.
+- Update configuration paths.
+- Update tests.
+- Update documentation.
+
+Before deleting or renaming anything, check whether it is referenced elsewhere.
+
+Do not delete files just because their names appear unusual.
+
+Create a refactoring report showing old paths, new paths, and reasons for changes.
+
+---
+
+# 10. Documentation Requirements
+
+Create comprehensive project documentation.
+
+Documentation is part of the deliverable, not an optional task.
+
+Create a `docs/` directory.
+
+Required documents:
+
+### 1. `README.md`
+
+The main project documentation should include:
+
+- Project overview.
+- Main features.
+- Technology stack.
+- Architecture overview.
+- Screenshots.
+- Installation instructions.
+- Environment setup.
+- Running the backend.
+- Running the frontend.
+- Production build.
+- Testing instructions.
+- API documentation link.
+- Contribution guidelines.
+
+### 2. `docs/ARCHITECTURE.md`
+
+Document:
+
+- Overall architecture.
+- Backend structure.
+- Frontend structure.
+- Database relationships.
+- API communication.
+- Authentication flow.
+- Role-based access.
+- Music upload flow.
+- Music playback flow.
+- Notification architecture.
+
+Include diagrams where useful.
+
+### 3. `docs/API.md`
+
+Document:
+
+- API endpoints.
+- HTTP methods.
+- Request parameters.
+- Request bodies.
+- Response structures.
+- Authentication requirements.
+- Error responses.
+- Rate limits.
+
+Generate this documentation from the actual implementation, not assumptions.
+
+### 4. `docs/DATABASE.md`
+
+Document:
+
+- Database models.
+- Tables.
+- Relationships.
+- Foreign keys.
+- Important indexes.
+- Constraints.
+
+### 5. `docs/SECURITY.md`
+
+Document:
+
+- Authentication.
+- Authorization.
+- Password hashing.
+- Token handling.
+- Rate limiting.
+- Input validation.
+- Upload security.
+- HTTP headers.
+- CORS.
+- Secrets management.
+- Security testing.
+
+### 6. `docs/PRIVACY_POLICY.md`
+
+Document the privacy policy content and its relationship to actual application data handling.
+
+### 7. `docs/TERMS_OF_SERVICE.md`
+
+Document the terms of service.
+
+### 8. `docs/DEVELOPMENT.md`
+
+Explain:
+
+- Local setup.
+- Dependencies.
+- Project conventions.
+- Development commands.
+- Testing.
+- Database migrations.
+- Build process.
+
+### 9. `docs/CHANGELOG.md`
+
+Track important project changes and releases.
+
+### Documentation rules
+
+- Keep documentation accurate.
+- Update it when implementation changes.
+- Do not document nonexistent features as implemented.
+- Include practical examples.
+- Avoid unnecessary complexity.
+- Use consistent Markdown formatting.
+- Explain how to run and maintain the project.
+
+---
+
+# 11. Backend Integration
+
+Create a centralized API client.
+
+Requirements:
+
+- One configurable API base URL.
+- Bearer authentication.
+- Consistent error handling.
+- Loading states.
+- Empty states.
+- Unauthorized request handling.
+- TypeScript interfaces matching backend schemas.
+- Centralized API services.
+
+All UI interactions must use real backend operations.
+
+Do not fake successful operations.
+
+Use optimistic updates only when rollback is implemented.
+
+Do not create fake data to replace backend responses.
+
+---
+
+# 12. Same-Origin Deployment Through FastAPI
+
+The final production application must be served through FastAPI.
+
+The existing `app/main.py` references a frontend directory named `Frontend/`.
+
+Inspect and correctly configure:
+
+- Vite production output.
+- FastAPI static file serving.
+- SPA fallback routing.
+- Static assets.
+- Relative API URLs.
+- Development proxy.
+- Route precedence.
+
+Expected production URL:
+
+`http://localhost:5001/`
+
+Swagger must remain accessible:
+
+`http://localhost:5001/docs`
+
+Direct navigation and refreshing nested React routes must work.
+
+API endpoints must never be intercepted by the frontend fallback.
+
+Do not consider the application complete if it only works through the Vite development server.
+
+---
+
+# 13. Development Workflow & Completion Gates
+
+Work incrementally.
+
+## Stage 1 — Audit
+
+Inspect:
+- Backend.
+- Frontend requirements.
+- Database.
+- APIs.
+- Security.
+- Existing project structure.
+
+Deliver:
+- Backend integration map.
+- Architecture assessment.
+- Security audit.
+- Refactoring plan.
+
+Do not begin large-scale implementation before completing the audit.
+
+## Stage 2 — Architecture and Design System
+
+Implement:
+- Clean project structure.
+- Naming conventions.
+- Three-color design system.
+- Typography.
+- Spacing tokens.
+- Dark and light themes.
+- Reusable UI components.
+
+Test visual consistency across initial pages.
+
+## Stage 3 — Foundation
+
+Implement:
+- React.
+- TypeScript.
+- Vite.
+- Routing.
+- API client.
+- Authentication.
+- Role-aware navigation.
+- Global layouts.
+
+Test authentication and API connectivity.
+
+## Stage 4 — Music Features
+
+Implement:
+- Discovery.
+- Tracks.
+- Artists.
+- Albums.
+- Persistent music player.
+
+Test actual backend integration and playback.
+
+## Stage 5 — Social Features
+
+Implement:
+- Feed.
+- Posts.
+- Comments.
+- Likes.
+- Ratings.
+- Reposts.
+- Following.
+
+Test actual CRUD operations and authorization.
+
+## Stage 6 — Listener and Artist Experiences
+
+Implement:
+- Listener experience.
+- Artist dashboard.
+- Upload workflows.
+- Album management.
+- User profiles.
+- Playlists.
+
+Test role separation and ownership rules.
+
+## Stage 7 — Security
+
+Implement and test:
+- Rate limiting.
+- Authentication protection.
+- Authorization.
+- Input validation.
+- XSS protection.
+- Upload validation.
+- CORS.
+- Security headers.
+- Secure configuration.
+- Logging.
+
+## Stage 8 — Legal Pages and Documentation
+
+Implement:
+- Privacy Policy.
+- Terms of Service.
+- README.
+- Architecture documentation.
+- API documentation.
+- Database documentation.
+- Security documentation.
+- Development documentation.
+
+## Stage 9 — Final Testing and Deployment
+
+Test:
+- All application routes.
+- All user roles.
+- All major API operations.
+- Music playback.
+- Uploads.
+- Notifications.
+- Security controls.
+- Responsive behavior.
+- Dark and light themes.
+- Production build.
+- FastAPI static serving.
+- Direct navigation and browser refresh.
+
+At the end of each stage, document the completed work and test results.
+
+Do not proceed while critical integration failures remain unresolved.
+
+---
+
+# 14. Final Quality Standards
+
+The final application must satisfy these requirements:
+
+### Design
+- Three recognizable primary brand colors.
+- Professional visual identity.
+- Comfortable reading experience.
+- Consistent design system.
+- Excellent responsive behavior.
+- Distinct Listener and Artist experiences.
+
+### Engineering
+- Clean architecture.
+- Consistent naming.
+- Maintainable modules.
+- No unnecessary duplication.
+- Proper separation of responsibilities.
+- Reliable API integration.
+
+### Security
+- Proper authentication.
+- Server-side authorization.
+- Rate limiting.
+- Safe uploads.
+- Input validation.
+- Secure secrets management.
+- Appropriate HTTP protections.
+- Documented security testing.
+
+### Product
+- Functional music player.
+- Working social features.
+- Artist publishing.
+- Playlists.
+- Profiles.
+- Notifications.
+- Privacy Policy.
+- Terms of Service.
+
+### Documentation
+- Complete README.
+- Architecture documentation.
+- API documentation.
+- Database documentation.
+- Security documentation.
+- Development documentation.
+
+### Deployment
+- One-origin production deployment through FastAPI.
+- Working static assets.
+- Working SPA routing.
+- Working API requests.
+- Working Swagger documentation.
+
+## Final Instruction
+
+Think and work like a senior software architect, security engineer, and professional product designer.
+
+Do not prioritize the number of pages over quality.
+
+Do not prioritize visual appearance over functionality.
+
+Do not prioritize speed over maintainability.
+
+Audit first, plan second, implement incrementally, and test continuously.
+
+The final deliverable must be a clean, documented, secure, maintainable, and professionally designed Npop application — not just a collection of attractive screens.

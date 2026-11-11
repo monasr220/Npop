@@ -5,6 +5,8 @@ from datetime import datetime
 from pydantic import Field
 
 from app.schemas.common import BaseReadSchema, BaseSchema
+from app.schemas.track import TrackRead
+from app.schemas.user import UserPublic
 
 
 class PostBase(BaseSchema):
@@ -38,6 +40,10 @@ class PostRead(BaseReadSchema):
     updated_at: datetime
     average_rating: float | None = None
     rating_count: int = 0
+    likes_count: int = 0
+    comments_count: int = 0
+    user: UserPublic | None = None
+    track: TrackRead | None = None
 
 
 class LikeCreate(BaseSchema):

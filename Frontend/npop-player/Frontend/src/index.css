@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================== design tokens */
+:root,
+[data-theme="dark"] {
+  /* Brand — Electric Indigo / Coral Pink / Mint Green */
+  --brand-primary: 103 80 216;
+  --brand-social: 241 107 120;
+  --brand-success: 54 201 165;
+
+  --bg: 14 16 22;
+  --surface: 22 26 35;
+  --surface-2: 30 35 47;
+  --border: 42 48 64;
+  --text: 233 237 245;
+  --muted: 153 163 184;
+
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --brand-primary: 91 70 200;
+  --brand-social: 224 84 100;
+  --brand-success: 28 166 137;
+
+  --bg: 246 247 251;
+  --surface: 255 255 255;
+  --surface-2: 238 241 247;
+  --border: 221 226 236;
+  --text: 21 25 37;
+  --muted: 91 100 120;
+
+  color-scheme: light;
+}
+
+/* ================================================================== base */
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: rgb(var(--bg));
+  background-image: radial-gradient(
+    1200px 600px at 15% -10%,
+    rgb(var(--brand-primary) / 0.12),
+    transparent 60%
+  );
+  color: rgb(var(--text));
+  font-family:
+    "Inter", "Segoe UI Variable", "Segoe UI", system-ui, -apple-system,
+    sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgb(var(--brand-primary) / 0.35);
+}
+
+*:focus-visible {
+  outline: 2px solid rgb(var(--brand-primary) / 0.85);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Comfortable scrollbars that do not scream for attention. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--border)) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgb(var(--border));
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ============================================================== components */
+@layer components {
+  .surface-card {
+    @apply rounded-2xl border border-app-border bg-app-surface;
+  }
+
+  .input-base {
+    @apply w-full rounded-xl border border-app-border bg-app-raised px-3.5 py-2.5 text-sm text-app-text placeholder:text-app-muted/70 transition-colors;
+  }
+
+  .input-base:focus {
+    @apply border-brand-primary/70 outline-none ring-2 ring-brand-primary/25;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-lg bg-app-raised;
+  }
+
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0 -translate-x-full animate-shimmer;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--brand-primary) / 0.08),
+      transparent
+    );
+  }
+
+  .prose-legal {
+    @apply text-[0.95rem] leading-7 text-app-muted;
+  }
+
+  .prose-legal h2 {
+    @apply mb-2 mt-9 text-lg font-semibold text-app-text;
+  }
+
+  .prose-legal h3 {
+    @apply mb-1 mt-6 text-base font-semibold text-app-text;
+  }
+
+  .prose-legal p {
+    @apply my-3;
+  }
+
+  .prose-legal ul {
+    @apply my-3 list-disc space-y-1.5 pl-6;
+  }
+
+  .prose-legal a {
+    @apply text-brand-primary underline underline-offset-2;
+  }
+}
+
+/* ======================================================= reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ============================================================ equalizer */
+/* Vertical range input: min at the bottom, max at the top. */
+.eq-slider {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 1.5rem;
+  height: 7.5rem;
+  cursor: pointer;
+  accent-color: rgb(var(--brand-primary));
+}
+
+.eq-slider:disabled {
+  cursor: not-allowed;
+}

@@ -11,9 +11,8 @@ from datetime import datetime
 
 from pydantic import Field
 
-from app.models.user import RoleEnum
 from app.schemas.album import AlbumRead
-from app.schemas.common import BaseReadSchema, BaseSchema
+from app.schemas.common import BaseSchema
 from app.schemas.favorite_track import FavoriteTrackRead
 from app.schemas.playlist import PlaylistRead
 from app.schemas.playlist_track import PlaylistTrackRead
@@ -21,7 +20,7 @@ from app.schemas.post import LikeRead, PostRead
 from app.schemas.post_comment import PostCommentRead
 from app.schemas.profile_track import ProfileTrackRead
 from app.schemas.track import TrackRead
-from app.schemas.user import UserRead
+from app.schemas.user import UserPublic, UserRead
 
 
 # --------------------------------------------------------------------- auth
@@ -38,17 +37,6 @@ class TokenResponse(BaseSchema):
 
 
 # --------------------------------------------------------------------- users
-class UserPublic(BaseReadSchema):
-    """User profile safe to show to other users (no email)."""
-
-    username: str
-    bio: str | None
-    contact_info: str | None
-    role: RoleEnum
-    last_login: datetime | None
-    updated_at: datetime
-
-
 class ProfileMusicResponse(BaseSchema):
     user: UserPublic
     profile_tracks: list[ProfileTrackRead]
@@ -151,8 +139,6 @@ class PostLikeDetail(LikeRead):
 
 
 class PostDetail(PostRead):
-    user: UserPublic | None = None
-    track: TrackRead | None = None
     comments: list[PostCommentDetail] = Field(default_factory=list)
     likes: list[PostLikeDetail] = Field(default_factory=list)
 

@@ -10,6 +10,7 @@ from app.models.social_link import SocialLink
 from app.schemas.social_link import SocialLinkCreate
 from app.services.base import CRUDService
 from app.utils.pagination import DEFAULT_PAGE_SIZE, paginate
+from app.utils.storage import ensure_http_url
 
 
 class SocialLinkService(CRUDService[SocialLink]):
@@ -38,13 +39,19 @@ class SocialLinkService(CRUDService[SocialLink]):
         links: Sequence[str],
     ) -> list[SocialLink]:
         """Replace all of a user's links with ``links``."""
+        cleaned = [
+            ensure_http_url(link, field="Social link")
+            for link in links
+            if link and link.strip()
+        ]
+
         db.query(SocialLink).filter(SocialLink.user_id == user_id).delete(
             synchronize_session=False
         )
 
         new_links = [
             SocialLink(user_id=user_id, link=link)
-            for link in dict.fromkeys(links)  # de-duplicate while preserving order
+            for link in dict.fromkeys(cleaned)  # de-duplicate while preserving order
         ]
         db.add_all(new_links)
         db.commit()
@@ -58,7 +65,13 @@ class SocialLinkService(CRUDService[SocialLink]):
         user_id: str,
         link: str,
     ) -> SocialLink:
-        return self.create(db, SocialLinkCreate(user_id=user_id, link=link))
+        return self.create(
+            db,
+            SocialLinkCreate(
+                user_id=user_id,
+                link=ensure_http_url(link, field="Social link"),
+            ),
+        )
 
 
 social_link_service = SocialLinkService()

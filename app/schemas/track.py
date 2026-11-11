@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pydantic import Field
 
+from app.schemas.album import AlbumRead
+from app.schemas.artist import ArtistRead
 from app.schemas.common import BaseReadSchema, BaseSchema
 
 
@@ -36,3 +38,5 @@ class TrackRead(BaseReadSchema):
     track_number: int
     explicit: bool
     plays: int
+    artist: ArtistRead | None = None
+    album: AlbumRead | None = None

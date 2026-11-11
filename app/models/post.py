@@ -65,6 +65,14 @@ class Post(AbstractBaseModel):
     def rating_count(self) -> int:
         return len(self.ratings)
 
+    @property
+    def likes_count(self) -> int:
+        return sum(1 for like in self.likes if like.liked)
+
+    @property
+    def comments_count(self) -> int:
+        return len(self.comments)
+
     def __str__(self) -> str:
         return self.content or self.image or self.video or ""
 

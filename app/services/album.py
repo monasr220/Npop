@@ -12,7 +12,7 @@ from app.services.artist import artist_service
 from app.services.base import CRUDService
 from app.utils.crud import apply_updates, commit_and_refresh
 from app.utils.pagination import DEFAULT_PAGE_SIZE, paginate
-from app.utils.storage import upload
+from app.utils.storage import ensure_http_url, upload
 
 
 class AlbumService(CRUDService[Album]):
@@ -68,6 +68,10 @@ class AlbumService(CRUDService[Album]):
 
         data = payload.model_dump()
         data["artist_id"] = artist.id
+        if data.get("cover_url"):
+            data["cover_url"] = ensure_http_url(
+                data["cover_url"], field="cover_url"
+            )
         return self.create(db, data)
 
     def _require_owned_album(
@@ -96,14 +100,14 @@ class AlbumService(CRUDService[Album]):
         album = self._require_owned_album(db, user, album_id)
 
         if hasattr(image, "read"):
-            cover_url = upload(image)
+            cover_url = upload(image, kind="image", folder="npop/covers")
             if not cover_url:
                 raise HTTPException(
                     status_code=status.HTTP_502_BAD_GATEWAY,
                     detail="Album cover upload failed",
                 )
         else:
-            cover_url = str(image)
+            cover_url = ensure_http_url(str(image), field="cover_url")
 
         album.cover_url = cover_url
         return commit_and_refresh(db, album)
@@ -120,6 +124,10 @@ class AlbumService(CRUDService[Album]):
             exclude_unset=True,
             exclude={"artist_id"},
         )
+        if data.get("cover_url"):
+            data["cover_url"] = ensure_http_url(
+                data["cover_url"], field="cover_url"
+            )
         apply_updates(album, data)
         return commit_and_refresh(db, album)
 

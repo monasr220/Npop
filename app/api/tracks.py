@@ -2,10 +2,21 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    Query,
+    Request,
+    UploadFile,
+    status,
+)
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_optional_user
+from app.core.config import settings
+from app.core.limiter import limiter
 from app.db.session import get_db
 from app.models.track import Track
 from app.models.user import User
@@ -44,7 +55,9 @@ def most_played(
 
 
 @router.post("/hosted", response_model=TrackRead, status_code=status.HTTP_201_CREATED)
+@limiter.limit(settings.rate_limit_upload)
 def upload_hosted_track(
+    request: Request,
     payload: TrackUploadRequest,
     current: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -56,7 +69,9 @@ def upload_hosted_track(
 
 
 @router.post("", response_model=TrackRead, status_code=status.HTTP_201_CREATED)
+@limiter.limit(settings.rate_limit_upload)
 def upload_track(
+    request: Request,
     title: str = Form(min_length=1, max_length=200),
     album_id: str = Form(min_length=1, max_length=36),
     duration: int = Form(default=0, ge=0),

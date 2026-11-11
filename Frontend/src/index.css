@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================== design tokens */
+/* Brand palette — exactly three colours:
+ *   Warm Beige  #E8DCC8  warmth, surfaces, reading comfort
+ *   Deep Red    #B3262D  actions, active states, likes, highlights
+ *   Matte Black #171717  structure, typography, dark background
+ *
+ * `--brand-primary` / `--brand-social` are the text-and-icon shades. On dark
+ * surfaces the red is lifted to keep WCAG-AA contrast; `--brand-solid` is the
+ * action fill and `--brand-on` is the text placed on top of it. The dark action
+ * fill is lifted just enough for a 3:1 boundary against matte black while
+ * keeping white text at AA.
+ * `--brand-success` is a warm neutral, not a fourth brand colour.
+ */
+:root,
+[data-theme="dark"] {
+  --brand-primary: 233 116 121;
+  --brand-social: 233 116 121;
+  --brand-success: 201 191 168;
+  --brand-solid: 193 53 60;
+  --brand-on: 255 255 255;
+
+  --bg: 23 23 23;
+  --surface: 30 29 27;
+  --surface-2: 39 37 34;
+  --border: 58 54 49;
+  --border-strong: 124 116 105;
+  --text: 232 220 200;
+  --muted: 167 158 142;
+
+  /* Theme-independent tones used by artwork placeholders. */
+  --ink: 23 23 23;
+  --ink-soft: 58 46 42;
+
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --brand-primary: 179 38 45;
+  --brand-social: 179 38 45;
+  --brand-success: 92 87 76;
+  --brand-solid: 179 38 45;
+  --brand-on: 255 255 255;
+
+  --bg: 232 220 200;
+  --surface: 243 235 221;
+  --surface-2: 227 215 194;
+  --border: 201 185 156;
+  --border-strong: 143 124 88;
+  --text: 23 23 23;
+  --muted: 94 87 76;
+
+  --ink: 23 23 23;
+  --ink-soft: 58 46 42;
+
+  color-scheme: light;
+}
+
+/* ================================================================== base */
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: rgb(var(--bg));
+  color: rgb(var(--text));
+  font-family:
+    "Inter", "Segoe UI Variable", "Segoe UI", system-ui, -apple-system,
+    sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgb(var(--brand-primary) / 0.35);
+}
+
+*:focus-visible {
+  outline: 2px solid rgb(var(--brand-primary) / 0.85);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Comfortable scrollbars that do not scream for attention. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--border)) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgb(var(--border));
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ============================================================== components */
+@layer components {
+  .surface-card {
+    @apply rounded-2xl border border-app-border bg-app-surface;
+  }
+
+  /* One consistent editorial wash for hero and profile banners. Keeps the red
+   * as an accent instead of a competing background colour. */
+  .hero-wash {
+    background-image:
+      radial-gradient(
+        680px 340px at 8% 0%,
+        rgb(var(--brand-solid) / 0.16),
+        transparent 70%
+      ),
+      linear-gradient(120deg, rgb(var(--text) / 0.05), transparent 55%);
+  }
+
+  .input-base {
+    @apply w-full rounded-xl border border-app-strong bg-app-raised px-3.5 py-2.5 text-sm text-app-text placeholder:text-app-muted/70 transition-colors;
+  }
+
+  .input-base:focus {
+    @apply border-brand-primary/70 outline-none ring-2 ring-brand-primary/25;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-lg bg-app-raised;
+  }
+
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0 -translate-x-full animate-shimmer;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--brand-primary) / 0.08),
+      transparent
+    );
+  }
+
+  .prose-legal {
+    @apply text-[0.95rem] leading-7 text-app-muted;
+  }
+
+  .prose-legal h2 {
+    @apply mb-2 mt-9 text-lg font-semibold text-app-text;
+  }
+
+  .prose-legal h3 {
+    @apply mb-1 mt-6 text-base font-semibold text-app-text;
+  }
+
+  .prose-legal p {
+    @apply my-3;
+  }
+
+  .prose-legal ul {
+    @apply my-3 list-disc space-y-1.5 pl-6;
+  }
+
+  .prose-legal a {
+    @apply text-brand-primary underline underline-offset-2;
+  }
+}
+
+/* ======================================================= reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ============================================================ equalizer */
+/* Vertical range input: min at the bottom, max at the top. */
+.eq-slider {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 1.5rem;
+  height: 7.5rem;
+  cursor: pointer;
+  accent-color: rgb(var(--brand-primary));
+}
+
+.eq-slider:disabled {
+  cursor: not-allowed;
+}

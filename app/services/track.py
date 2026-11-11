@@ -14,7 +14,7 @@ from app.services.base import CRUDService
 from app.services.playlist_history import play_history_service
 from app.utils.crud import apply_updates, commit_and_refresh
 from app.utils.pagination import DEFAULT_PAGE_SIZE, paginate
-from app.utils.storage import upload
+from app.utils.storage import ensure_http_url, upload
 
 
 class TrackService(CRUDService[Track]):
@@ -104,7 +104,7 @@ class TrackService(CRUDService[Track]):
 
         audio_url = payload.audio_url
         if file is not None and hasattr(file, "read"):
-            uploaded_url = upload(file)
+            uploaded_url = upload(file, kind="audio", folder="npop/audio")
             if not uploaded_url:
                 raise HTTPException(
                     status_code=status.HTTP_502_BAD_GATEWAY,
@@ -117,6 +117,7 @@ class TrackService(CRUDService[Track]):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="An audio file or audio_url is required",
             )
+        audio_url = ensure_http_url(audio_url, field="audio_url")
 
         data = payload.model_dump()
         data["artist_id"] = artist.id
@@ -176,6 +177,11 @@ class TrackService(CRUDService[Track]):
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="You can only move tracks to your own albums",
                 )
+
+        if data.get("audio_url"):
+            data["audio_url"] = ensure_http_url(
+                data["audio_url"], field="audio_url"
+            )
 
         apply_updates(track, data)
         return commit_and_refresh(db, track)

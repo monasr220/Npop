@@ -13,11 +13,12 @@ from app.core.security import (
     create_access_token,
     decode_access_token,
     hash_password,
+    password_needs_rehash,
     verify_password,
 )
 from app.models.playlist_history import PlayHistory
 from app.models.track import Track
-from app.models.user import User, followers_table
+from app.models.user import RoleEnum, User, followers_table
 from app.schemas.user import UserCreate, UserUpdate
 from app.services.access_token import access_token_service
 from app.services.base import CRUDService
@@ -131,6 +132,10 @@ class UserService(CRUDService[User]):
         if user is None or not verify_password(password, user.password):
             raise CREDENTIALS_ERROR
 
+        # Transparently upgrade legacy scrypt hashes to Argon2id on login.
+        if password_needs_rehash(user.password):
+            user.password = hash_password(password)
+
         user.last_login = utcnow()
         user = commit_and_refresh(db, user)
 
@@ -170,7 +175,17 @@ class UserService(CRUDService[User]):
         user_id: str,
         payload: UserUpdate,
     ) -> User:
-        if user.id != user_id:
+        """Update a profile.
+
+        Users may edit their own profile; administrators may edit any profile
+        (role changes are admin-only and enforced by the API layer as well).
+        An administrator cannot change their own role, which prevents an
+        accidental self-demotion and lockout.
+        """
+        target = self.get_or_404(db, user_id)
+        is_self = user.id == target.id
+
+        if not is_self and user.role != RoleEnum.admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You do not have permission to update this user",
@@ -178,10 +193,22 @@ class UserService(CRUDService[User]):
 
         data = payload.model_dump(exclude_unset=True)
 
+        if "role" in data:
+            if user.role != RoleEnum.admin:
+                data.pop("role")
+            elif is_self and data["role"] != target.role:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Administrators cannot change their own role",
+                )
+
+        if "last_login" in data and user.role != RoleEnum.admin:
+            data.pop("last_login")
+
         new_email = data.get("email")
-        if new_email and new_email != user.email:
+        if new_email and new_email != target.email:
             existing = self.get_by_email(db, new_email)
-            if existing is not None and existing.id != user.id:
+            if existing is not None and existing.id != target.id:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="User with email already exists",
@@ -192,19 +219,34 @@ class UserService(CRUDService[User]):
             data["password"] = hash_password(password)
 
         for field, value in data.items():
-            setattr(user, field, value)
+            setattr(target, field, value)
 
-        user = commit_and_refresh(db, user)
-        notification_service.notify(db, user.id, "Account updated successfully")
-        return user
+        target = commit_and_refresh(db, target)
+        notification_service.notify(db, target.id, "Account updated successfully")
+        return target
 
     def delete_profile(self, db: Session, user: User, user_id: str) -> None:
-        if user.id != user_id:
+        """Delete an account.
+
+        Users may delete their own account; administrators may delete other
+        accounts.  Administrators cannot delete their own account through this
+        endpoint, which avoids locking the instance out of its last admin.
+        """
+        target = self.get_or_404(db, user_id)
+        is_self = user.id == target.id
+
+        if not is_self and user.role != RoleEnum.admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You do not have permission to delete this user",
             )
-        db.delete(user)
+        if is_self and user.role == RoleEnum.admin:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Administrators cannot delete their own account",
+            )
+
+        db.delete(target)
         db.commit()
 
     def set_profile_picture(self, db: Session, user: User, image):
